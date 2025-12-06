@@ -461,12 +461,3 @@ If you use this repository in scientific work, please consider citing:
 * F. Beck et al., *Model Predictive Trajectory Optimization With Dynamically Changing Waypoints for Serial Manipulators*, IEEE RA-L, 2024. 
 * H. H. Nguyen et al., *Language-driven Closed-loop Grasping with Model-predictive Trajectory Optimization*, Mechatronics, 2025. 
 
-And this implementation:
-
-> H.-S. Lin, **wmpc: Waypoint MPC for UR5 with MATLAB–ROS 2 Bridge**, GitHub repository, 2025.
-
-```
-
-**a.** If you want, I can add a short “Troubleshooting” section (common build / ROS / MATLAB issues) to this README.  
-**b.** Or we can add a small “Quick demo script” in Python that auto-sends a sequence of waypoints/goals to showcase the controller.
-```
