@@ -83,7 +83,7 @@ We use a **joint-space double integrator** model for the UR5e:
 
 This is obtained by assuming a lower-level inverse dynamics / PD law compensates the nonlinear dynamics (mass, Coriolis, gravity), so the closed-loop behaves approximately as ( \ddot q = u ). 
 
-We intentionally use **double** instead of the **triple integrator** from the original wMPC paper, because the real UR5e does not expose jerk control.
+We intentionally use **double** instead of the **triple integrator** from the original wMPC paper, because our real UR5e did not have jerk control.
 
 ### 3.2 FOH Discretization (Double Integrator)
 
