@@ -72,16 +72,24 @@ wmpc/
 
 We use a **joint-space double integrator** model for the UR5e:
 
-* State:
-  [
-  x = \begin{bmatrix} q \ \dot q \end{bmatrix} \in \mathbb{R}^{2m}, \quad m = 6
-  ]
-* Control:
-  [
-  u = \ddot q \in \mathbb{R}^{m}
-  ]
+- **State**
 
-This is obtained by assuming a lower-level inverse dynamics / PD law compensates the nonlinear dynamics (mass, Coriolis, gravity), so the closed-loop behaves approximately as ( \ddot q = u ). 
+$$
+x =
+\begin{bmatrix}
+q \\
+\dot q
+\end{bmatrix}
+\in \mathbb{R}^{2m},\quad m = 6
+$$
+
+- **Control**
+
+$$
+u = \ddot q \in \mathbb{R}^m
+$$
+
+This is obtained by assuming a lower-level inverse dynamics / PD law compensates the nonlinear dynamics (mass, Coriolis, gravity), so the closed-loop behaves approximately as $\ddot q = u$. 
 
 We intentionally use **double** instead of the **triple integrator** from the original wMPC paper, because our real UR5e did not have jerk control.
 
@@ -89,28 +97,28 @@ We intentionally use **double** instead of the **triple integrator** from the or
 
 We assume **First-Order Hold (FOH)** on the input:
 
-[
+$$
 u(t) = u_k + \frac{t}{h},(u_{k+1}-u_k), \quad t \in [0,h],
-]
+$$
 
-with sampling time (h). Integrating the double-integrator dynamics over ([kh,(k+1)h]) yields (per joint):
+with sampling time (h). Integrating the double-integrator dynamics over $[kh,(k+1)h]$ yields (per joint):
 
-[
+$$
 \begin{aligned}
 q_{k+1}   &= q_k + h\dot q_k + \tfrac{h^2}{3}u_k + \tfrac{h^2}{6}u_{k+1},\
 \dot q_{k+1} &= \dot q_k + \tfrac{h}{2}u_k + \tfrac{h}{2}u_{k+1}.
 \end{aligned}
-]
+$$
 
 Matrix form:
 
-[
+$$
 x_{k+1} = \Phi x_k + \Gamma_1 u_k + \Gamma_2 u_{k+1},
-]
+$$
 
 where
 
-[
+$$
 \Phi=
 \begin{bmatrix}
 I & hI\
@@ -126,7 +134,7 @@ I & hI\
 \frac{h^2}{6}I\
 \frac{h}{2}I
 \end{bmatrix}.
-]
+$$
 
 The code in `wmpc_double_integrator.py` constructs these matrices and uses them in the MPC constraints.
 
@@ -134,16 +142,16 @@ The code in `wmpc_double_integrator.py` constructs these matrices and uses them 
 
 We consider:
 
-* A joint-space waypoint (q_w)
-* A joint-space goal (q_g)
+* A joint-space waypoint $q_w$
+* A joint-space goal $q_g$
 
 The core idea from Beck et al.:
 
-* Plan with a **short receding horizon** of length (N)
-* As soon as (q_w) becomes reachable within the horizon (up to tolerance ( \varepsilon )), split the horizon at index (N_s)
-* First part ((0 \dots N_s-1)): cost-to-go and possibly terminal constraints towards (q_w)
-* Second part ((N_s \dots N-1)): cost-to-go and terminal constraints towards (q_g)
-* Gradually shrink (N) as (q_g) comes into the horizon to avoid tail oscillations 
+* Plan with a **short receding horizon** of length $N$
+* As soon as $q_w$ becomes reachable within the horizon (up to tolerance $\varepsilon$), split the horizon at index $N_s$
+* First part $(0 \dots N_s-1)$: cost-to-go and possibly terminal constraints towards $q_w$
+* Second part $(N_s \dots N-1)$: cost-to-go and terminal constraints towards $q_g$
+* Gradually shrink $N$ as $q_g$ comes into the horizon to avoid tail oscillations 
 
 We use a smooth 1-norm (“smooth L1”) cost in joint space to encourage more time-optimal profiles while keeping optimization well-behaved near waypoints and goal.
 
@@ -151,27 +159,35 @@ We use a smooth 1-norm (“smooth L1”) cost in joint space to encourage more t
 
 For each MPC iteration:
 
-* Dynamics:
-  [
-  x_{k+1} = \Phi x_k + \Gamma_1 u_k + \Gamma_2 u_{k+1}
-  ]
-* Initial condition:
-  [
-  x_0 = [q_\text{meas}, \dot q_\text{meas}]
-  ]
-* Terminal “steady state”:
-  [
-  x_{N-1} = \Phi x_{N-1},\quad u_{N-1} = 0
-  ]
-* Box constraints:
-  [
-  q_{\min} \le q_k \le q_{\max},\
-  \dot q_{\min} \le \dot q_k \le \dot q_{\max},\
-  \ddot q_{\min} \le u_k \le \ddot q_{\max}
-  ]
-* Optional terminal sets:
+- **Dynamics:**
 
-  * If waypoint/goal is reachable: enforce (|q_{N_s-1,i} - q_{w,i}| \le \varepsilon) and/or (|q_{N-1,i} - q_{g,i}| \le \varepsilon)
+$$
+x_{k+1} = \Phi x_k + \Gamma_1 u_k + \Gamma_2 u_{k+1}
+$$
+
+- **Initial condition:**
+
+$$
+x_0 = [q_\text{meas}, \dot q_\text{meas}]
+$$
+
+- **Terminal “steady state”:**
+
+$$
+x_{N-1} = \Phi x_{N-1},\quad u_{N-1} = 0
+$$
+
+- **Box constraints:**
+
+$$
+q_{\min} \le q_k \le q_{\max},\
+\dot q_{\min} \le \dot q_k \le \dot q_{\max},\
+\ddot q_{\min} \le u_k \le \ddot q_{\max}
+$$
+
+- **Optional terminal sets:**
+
+  * If waypoint/goal is reachable: enforce $|q_{N_s-1,i} - q_{w,i}| \le \varepsilon$ and/or $|q_{N-1,i} - q_{g,i}| \le \varepsilon$
 
 ---
 
@@ -311,10 +327,11 @@ Every `h` seconds (`self.h ≈ 0.05 s`), `spin_loop()`:
                                        q_g=self.q_goal)
      ```
    * Integrate:
-     [
-     \dot q_\text{cmd} = \dot q + h,u_0
-     ]
+
+     $\dot q_\text{cmd} = \dot q + h,u_0$
+     
      clipped to UR5e velocity limits.
+     
    * Compute base twist:
 
      ```python
