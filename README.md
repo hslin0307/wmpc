@@ -66,7 +66,7 @@ wmpc/
 
 ---
 
-## 3. Theory (Short Version)
+## 3. Theory 
 
 ### 3.1 State and Control
 
