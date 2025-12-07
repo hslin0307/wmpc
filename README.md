@@ -1,4 +1,4 @@
-# wmpc: Waypoint MPC for UR5 with a MATLAB–ROS 2 Bridge
+# wMPC: Waypoint MPC for UR5 with a MATLAB–ROS 2 Bridge
 
 > **TL;DR**  
 > This repo connects a **UR5e MATLAB dynamics simulator** with a **ROS 2 waypoint Model Predictive Controller (wMPC)** in Python.  
